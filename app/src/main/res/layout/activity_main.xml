@@ -26,8 +26,8 @@
         android:text="@string/pause" />
 
     <Button
-        android:id="@+id/button_stop"
+        android:id="@+id/button_reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/stop" />
+        android:text="@string/reset" />
 </LinearLayout>
