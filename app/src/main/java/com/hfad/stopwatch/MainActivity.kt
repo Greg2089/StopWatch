@@ -2,7 +2,6 @@ package com.hfad.stopwatch
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.os.SystemClock
 import android.widget.Button
 import android.widget.Chronometer
@@ -30,13 +29,13 @@ class MainActivity : AppCompatActivity() {
         stopwatch = findViewById<Chronometer>(R.id.stopwatch)//получаем ссылку на Chronometer
 
         /**Восстанавливаем предыдущее состояние*/
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
-            if (running){
+            if (running) {
                 stopwatch.base = savedInstanceState.getLong(BASE_KEY)
                 stopwatch.start()
-            }else setBaseTime()
+            } else setBaseTime()
         }
 
 
@@ -72,6 +71,23 @@ class MainActivity : AppCompatActivity() {
         outState.putBoolean(RUNNING_KEY, running)
         outState.putLong(BASE_KEY, stopwatch.base)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (running){
+            saveOffset()
+            stopwatch.stop()
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        if (running){
+            setBaseTime()
+            stopwatch.start()
+            offset = 0
+        }
     }
 
     //обновляем stopwatch.base, учитывая любое смещение (offset)
