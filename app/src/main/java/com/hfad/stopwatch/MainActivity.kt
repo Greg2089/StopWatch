@@ -3,8 +3,8 @@ package com.hfad.stopwatch
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
-import android.widget.Button
-import android.widget.Chronometer
+import com.hfad.stopwatch.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
     /*используем 3 свойства для управления секундомером:
@@ -13,7 +13,10 @@ class MainActivity : AppCompatActivity() {
     и false, когда пользователь нажмет кнопку Пауза.
     3) Свойство offset используется для отображения правильного времени на секундомере,
     если секундомер был приостановлен и перезапущен. Без этого секундомер будет отображать неправильное время.*/
-    lateinit var stopwatch: Chronometer
+
+    //добавляем binding property
+    private lateinit var binding: ActivityMainBinding
+
     var running = false
     var offset: Long = 0
 
@@ -24,42 +27,42 @@ class MainActivity : AppCompatActivity() {
     val BASE_KEY = "base"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        stopwatch = findViewById<Chronometer>(R.id.stopwatch)//получаем ссылку на Chronometer
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         /**Восстанавливаем предыдущее состояние*/
         if (savedInstanceState != null) {
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
             if (running) {
-                stopwatch.base = savedInstanceState.getLong(BASE_KEY)
-                stopwatch.start()
+                binding.stopwatch.base = savedInstanceState.getLong(BASE_KEY)
+                binding.stopwatch.start()
             } else setBaseTime()
         }
 
 
         //кнопка startButton запускакет секундомер, если он не запущен
-        val startButton = findViewById<Button>(R.id.start_button)
-        startButton.setOnClickListener {
+
+        binding.buttonStart.setOnClickListener {
             if (!running) {
                 setBaseTime()
-                stopwatch.start()
+                binding.stopwatch.start()
                 running = true
             }
         }
         //кнопка pauseButton ставит на паузу секундомер, есди он запущен
-        var pauseButton = findViewById<Button>(R.id.button_pause)
-        pauseButton.setOnClickListener {
+
+        binding.buttonPause.setOnClickListener {
             if (running) {
                 saveOffset()//сохраняет время на секундомере
-                stopwatch.stop()
+                binding.stopwatch.stop()
                 running = false
             }
         }
         //кнопка resetButton устанавливает Свойство offset = 0
-        var resetButton = findViewById<Button>(R.id.button_reset)
-        resetButton.setOnClickListener {
+
+        binding.buttonReset.setOnClickListener {
             offset = 0
             setBaseTime()//устанавливаем секундомер назад на 0
         }
@@ -69,35 +72,35 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putLong(OFFSET_KEY, offset)
         outState.putBoolean(RUNNING_KEY, running)
-        outState.putLong(BASE_KEY, stopwatch.base)
+        outState.putLong(BASE_KEY, binding.stopwatch.base)
         super.onSaveInstanceState(outState)
     }
 
     override fun onPause() {
         super.onPause()
-        if (running){
+        if (running) {
             saveOffset()
-            stopwatch.stop()
+            binding.stopwatch.stop()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (running){
+        if (running) {
             setBaseTime()
-            stopwatch.start()
+            binding.stopwatch.start()
             offset = 0
         }
     }
 
     //обновляем stopwatch.base, учитывая любое смещение (offset)
     fun setBaseTime() {
-        stopwatch.base = SystemClock.elapsedRealtime() - offset
+       binding.stopwatch.base = SystemClock.elapsedRealtime() - offset
     }
 
     //записываем смещение
     fun saveOffset() {
-        offset = SystemClock.elapsedRealtime() - stopwatch.base
+        offset = SystemClock.elapsedRealtime() - binding.stopwatch.base
     }
 
 
